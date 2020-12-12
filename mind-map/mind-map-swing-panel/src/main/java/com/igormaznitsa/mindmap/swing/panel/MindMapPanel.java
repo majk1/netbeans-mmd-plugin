@@ -16,21 +16,9 @@
 
 package com.igormaznitsa.mindmap.swing.panel;
 
-import static com.igormaznitsa.meta.common.utils.Assertions.assertNotNull;
-import static com.igormaznitsa.mindmap.swing.panel.utils.Utils.assertSwingDispatchThread;
-
-
 import com.igormaznitsa.meta.annotation.MustNotContainNull;
 import com.igormaznitsa.meta.common.utils.Assertions;
-import com.igormaznitsa.mindmap.model.Extra;
-import com.igormaznitsa.mindmap.model.ExtraFile;
-import com.igormaznitsa.mindmap.model.ExtraLink;
-import com.igormaznitsa.mindmap.model.ExtraNote;
-import com.igormaznitsa.mindmap.model.ExtraTopic;
-import com.igormaznitsa.mindmap.model.MindMap;
-import com.igormaznitsa.mindmap.model.ModelUtils;
-import com.igormaznitsa.mindmap.model.Topic;
-import com.igormaznitsa.mindmap.model.TopicChecker;
+import com.igormaznitsa.mindmap.model.*;
 import com.igormaznitsa.mindmap.model.logger.Logger;
 import com.igormaznitsa.mindmap.model.logger.LoggerFactory;
 import com.igormaznitsa.mindmap.plugins.MindMapPluginRegistry;
@@ -38,13 +26,7 @@ import com.igormaznitsa.mindmap.plugins.api.ModelAwarePlugin;
 import com.igormaznitsa.mindmap.plugins.api.PanelAwarePlugin;
 import com.igormaznitsa.mindmap.plugins.api.PluginContext;
 import com.igormaznitsa.mindmap.plugins.api.VisualAttributePlugin;
-import com.igormaznitsa.mindmap.swing.panel.ui.AbstractCollapsableElement;
-import com.igormaznitsa.mindmap.swing.panel.ui.AbstractElement;
-import com.igormaznitsa.mindmap.swing.panel.ui.ElementLevelFirst;
-import com.igormaznitsa.mindmap.swing.panel.ui.ElementLevelOther;
-import com.igormaznitsa.mindmap.swing.panel.ui.ElementPart;
-import com.igormaznitsa.mindmap.swing.panel.ui.ElementRoot;
-import com.igormaznitsa.mindmap.swing.panel.ui.MouseSelectedArea;
+import com.igormaznitsa.mindmap.swing.panel.ui.*;
 import com.igormaznitsa.mindmap.swing.panel.ui.gfx.MMGraphics;
 import com.igormaznitsa.mindmap.swing.panel.ui.gfx.MMGraphics2DWrapper;
 import com.igormaznitsa.mindmap.swing.panel.ui.gfx.StrokeType;
@@ -54,33 +36,20 @@ import com.igormaznitsa.mindmap.swing.panel.utils.RenderQuality;
 import com.igormaznitsa.mindmap.swing.panel.utils.Utils;
 import com.igormaznitsa.mindmap.swing.services.UIComponentFactory;
 import com.igormaznitsa.mindmap.swing.services.UIComponentFactoryProvider;
-import java.awt.AWTEvent;
-import java.awt.BasicStroke;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Container;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.Insets;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.Toolkit;
+import org.apache.commons.lang.StringEscapeUtils;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
+import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
+import java.awt.event.*;
 import java.awt.geom.Dimension2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
@@ -88,32 +57,14 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.UUID;
-import java.util.WeakHashMap;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.swing.BorderFactory;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JTextArea;
-import javax.swing.JViewport;
-import javax.swing.SwingUtilities;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.event.PopupMenuEvent;
-import javax.swing.event.PopupMenuListener;
-import org.apache.commons.lang.StringEscapeUtils;
+import static com.igormaznitsa.meta.common.utils.Assertions.*;
+import static com.igormaznitsa.mindmap.swing.panel.utils.Utils.*;
 
 public class MindMapPanel extends JComponent implements ClipboardOwner {
 
@@ -343,7 +294,62 @@ public class MindMapPanel extends JComponent implements ClipboardOwner {
       public void keyTyped(@Nonnull final KeyEvent e) {
         if (lockIfNotDisposed()) {
           try {
-            if (config.isKeyEvent(MindMapPanelConfig.KEY_ADD_CHILD_AND_START_EDIT, e)) {
+            if (config.isKeyEvent(MindMapPanelConfig.KEY_TOPIC_RED, e)) {
+              e.consume();
+              if (hasSelectedTopics()) {
+                for (Topic selectedTopic : selectedTopics) {
+                  if (!selectedTopic.isRoot()) {
+                    selectedTopic.setAttribute(StandardTopicAttribute.ATTR_FILL_COLOR.getText(), "#FFC0C0");
+                    selectedTopic.setAttribute(StandardTopicAttribute.ATTR_TEXT_COLOR.getText(), "#891010");
+                    selectedTopic.setAttribute(StandardTopicAttribute.ATTR_BORDER_COLOR.getText(), "#891010");
+                  }
+                }
+                fireNotificationMindMapChanged(true);
+                revalidate();
+                repaint();
+              }
+            } else if (config.isKeyEvent(MindMapPanelConfig.KEY_TOPIC_YELLOW, e)) {
+              e.consume();
+              if (hasSelectedTopics()) {
+                for (Topic selectedTopic : selectedTopics) {
+                  if (!selectedTopic.isRoot()) {
+                    selectedTopic.setAttribute(StandardTopicAttribute.ATTR_FILL_COLOR.getText(), "#FFFAC0");
+                    selectedTopic.setAttribute(StandardTopicAttribute.ATTR_TEXT_COLOR.getText(), "#696010");
+                    selectedTopic.setAttribute(StandardTopicAttribute.ATTR_BORDER_COLOR.getText(), "#696010");
+                  }
+                }
+                fireNotificationMindMapChanged(true);
+                revalidate();
+                repaint();
+              }
+            } else if (config.isKeyEvent(MindMapPanelConfig.KEY_TOPIC_DEFAULT, e)) {
+              e.consume();
+              if (hasSelectedTopics()) {
+                for (Topic selectedTopic : selectedTopics) {
+                  selectedTopic.setAttribute(
+                      StandardTopicAttribute.ATTR_BORDER_COLOR.getText(),
+                      Utils.color2html(config.getElementBorderColor(), false));
+                  if (selectedTopic.getTopicLevel() == 1) {
+                    selectedTopic.setAttribute(
+                        StandardTopicAttribute.ATTR_FILL_COLOR.getText(),
+                        Utils.color2html(config.getFirstLevelBackgroundColor(), false));
+                    selectedTopic.setAttribute(
+                        StandardTopicAttribute.ATTR_TEXT_COLOR.getText(),
+                        Utils.color2html(config.getFirstLevelTextColor(), false));
+                  } else {
+                    selectedTopic.setAttribute(
+                        StandardTopicAttribute.ATTR_FILL_COLOR.getText(),
+                        Utils.color2html(config.getOtherLevelBackgroundColor(), false));
+                    selectedTopic.setAttribute(
+                        StandardTopicAttribute.ATTR_TEXT_COLOR.getText(),
+                        Utils.color2html(config.getOtherLevelTextColor(), false));
+                  }
+                }
+                fireNotificationMindMapChanged(true);
+                revalidate();
+                repaint();
+              }
+            } else if (config.isKeyEvent(MindMapPanelConfig.KEY_ADD_CHILD_AND_START_EDIT, e)) {
               e.consume();
               if (!selectedTopics.isEmpty()) {
                 makeNewChildAndStartEdit(selectedTopics.get(0), null);

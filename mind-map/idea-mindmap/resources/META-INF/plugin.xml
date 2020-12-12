@@ -23,6 +23,9 @@
           <li>added password protection for notes (AES-256)</li>
           <li>decreased topic dragging start sensitivity</li>
           <li>emoticons and images included into search scope by their names</li>
+          <li>---</li>
+          <li>Edit node text with Shift+Enter as default shortcut</li>
+          <li>Added shortcut keys R for red node, Y for yellow node, and X for default node coloring</li>
         </ul>
         <p>1.4.9 (28-jun-2020)</p>
         <ul>

@@ -16,38 +16,35 @@
 
 package com.igormaznitsa.mindmap.swing.panel;
 
-import static com.igormaznitsa.meta.common.utils.Assertions.assertNotNull;
-
-
 import com.igormaznitsa.meta.annotation.MustNotContainNull;
 import com.igormaznitsa.meta.annotation.ReturnsOriginal;
 import com.igormaznitsa.meta.common.utils.GetUtils;
 import com.igormaznitsa.mindmap.swing.panel.utils.KeyShortcut;
 import com.igormaznitsa.mindmap.swing.panel.utils.RenderQuality;
 import com.igormaznitsa.mindmap.swing.panel.utils.Utils;
-import java.awt.Color;
-import java.awt.Font;
+import org.apache.commons.lang.SystemUtils;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.io.Serializable;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.swing.KeyStroke;
-import org.apache.commons.lang.SystemUtils;
+import static com.igormaznitsa.meta.common.utils.Assertions.*;
 
 public final class MindMapPanelConfig implements Serializable {
 
   public static final String KEY_ADD_CHILD_AND_START_EDIT = "addChildAndStartEdit";
   public static final String KEY_ADD_SIBLING_AND_START_EDIT = "addSiblingAndStartEdit";
+  public static final String KEY_TOPIC_RED = "topicRedColor";
+  public static final String KEY_TOPIC_YELLOW = "topicYellowColor";
+  public static final String KEY_TOPIC_DEFAULT = "topicDefaultColor";
   public static final String KEY_FOCUS_ROOT_OR_START_EDIT = "focusToRootOrStartEdit";
   public static final String KEY_CANCEL_EDIT = "cancelEdit";
   public static final String KEY_TOPIC_FOLD = "topicFold";
@@ -127,6 +124,12 @@ public final class MindMapPanelConfig implements Serializable {
           new KeyShortcut(KEY_ADD_CHILD_AND_START_EDIT, KeyEvent.VK_TAB, 0));
       this.mapShortCut.put(KEY_ADD_SIBLING_AND_START_EDIT,
           new KeyShortcut(KEY_ADD_SIBLING_AND_START_EDIT, KeyEvent.VK_ENTER, 0));
+      this.mapShortCut.put(KEY_TOPIC_RED,
+          new KeyShortcut(KEY_TOPIC_RED, KeyEvent.VK_R, 0));
+      this.mapShortCut.put(KEY_TOPIC_YELLOW,
+          new KeyShortcut(KEY_TOPIC_YELLOW, KeyEvent.VK_Y, 0));
+      this.mapShortCut.put(KEY_TOPIC_DEFAULT,
+          new KeyShortcut(KEY_TOPIC_DEFAULT, KeyEvent.VK_X, 0));
       this.mapShortCut
           .put(KEY_CANCEL_EDIT, new KeyShortcut(KEY_CANCEL_EDIT, KeyEvent.VK_ESCAPE, 0));
       this.mapShortCut.put(KEY_TOPIC_FOLD, new KeyShortcut(KEY_TOPIC_FOLD, KeyEvent.VK_MINUS, 0));
@@ -137,7 +140,7 @@ public final class MindMapPanelConfig implements Serializable {
       this.mapShortCut.put(KEY_TOPIC_UNFOLD_ALL,
           new KeyShortcut(KEY_TOPIC_UNFOLD_ALL, KeyEvent.VK_EQUALS, KeyEvent.ALT_MASK));
       this.mapShortCut.put(KEY_FOCUS_ROOT_OR_START_EDIT,
-          new KeyShortcut(KEY_FOCUS_ROOT_OR_START_EDIT, KeyEvent.VK_SPACE, KeyEvent.ALT_MASK));
+          new KeyShortcut(KEY_FOCUS_ROOT_OR_START_EDIT, KeyEvent.VK_ENTER, KeyEvent.SHIFT_MASK));
       this.mapShortCut
           .put(KEY_FOCUS_MOVE_DOWN, new KeyShortcut(KEY_FOCUS_MOVE_DOWN, KeyEvent.VK_DOWN, 0));
       this.mapShortCut
@@ -173,6 +176,12 @@ public final class MindMapPanelConfig implements Serializable {
           new KeyShortcut(KEY_ADD_CHILD_AND_START_EDIT, KeyEvent.VK_TAB, 0));
       this.mapShortCut.put(KEY_ADD_SIBLING_AND_START_EDIT,
           new KeyShortcut(KEY_ADD_SIBLING_AND_START_EDIT, KeyEvent.VK_ENTER, 0));
+      this.mapShortCut.put(KEY_TOPIC_RED,
+          new KeyShortcut(KEY_TOPIC_RED, KeyEvent.VK_R, 0));
+      this.mapShortCut.put(KEY_TOPIC_YELLOW,
+          new KeyShortcut(KEY_TOPIC_YELLOW, KeyEvent.VK_Y, 0));
+      this.mapShortCut.put(KEY_TOPIC_DEFAULT,
+          new KeyShortcut(KEY_TOPIC_DEFAULT, KeyEvent.VK_X, 0));
       this.mapShortCut
           .put(KEY_CANCEL_EDIT, new KeyShortcut(KEY_CANCEL_EDIT, KeyEvent.VK_ESCAPE, 0));
       this.mapShortCut.put(KEY_TOPIC_FOLD, new KeyShortcut(KEY_TOPIC_FOLD, KeyEvent.VK_MINUS, 0));
@@ -183,7 +192,7 @@ public final class MindMapPanelConfig implements Serializable {
       this.mapShortCut.put(KEY_TOPIC_UNFOLD_ALL,
           new KeyShortcut(KEY_TOPIC_UNFOLD_ALL, KeyEvent.VK_EQUALS, KeyEvent.ALT_MASK));
       this.mapShortCut.put(KEY_FOCUS_ROOT_OR_START_EDIT,
-          new KeyShortcut(KEY_FOCUS_ROOT_OR_START_EDIT, KeyEvent.VK_SPACE, KeyEvent.CTRL_MASK));
+          new KeyShortcut(KEY_FOCUS_ROOT_OR_START_EDIT, KeyEvent.VK_ENTER, KeyEvent.SHIFT_MASK));
       this.mapShortCut
           .put(KEY_FOCUS_MOVE_DOWN, new KeyShortcut(KEY_FOCUS_MOVE_DOWN, KeyEvent.VK_DOWN, 0));
       this.mapShortCut
