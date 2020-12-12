@@ -26,6 +26,7 @@
           <li>---</li>
           <li>Edit node text with Shift+Enter as default shortcut</li>
           <li>Added shortcut keys R for red node, Y for yellow node, and X for default node coloring</li>
+          <li>Delete topic with backspace key on mac os has been set as default</li>
         </ul>
         <p>1.4.9 (28-jun-2020)</p>
         <ul>

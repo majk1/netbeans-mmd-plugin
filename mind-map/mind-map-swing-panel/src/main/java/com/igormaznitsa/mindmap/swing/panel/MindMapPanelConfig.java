@@ -159,7 +159,7 @@ public final class MindMapPanelConfig implements Serializable {
           new KeyShortcut(KEY_FOCUS_MOVE_RIGHT_ADD_FOCUSED, KeyEvent.VK_RIGHT,
               KeyEvent.SHIFT_MASK));
       this.mapShortCut
-          .put(KEY_DELETE_TOPIC, new KeyShortcut(KEY_DELETE_TOPIC, KeyEvent.VK_DELETE, 0));
+          .put(KEY_DELETE_TOPIC, new KeyShortcut(KEY_DELETE_TOPIC, KeyEvent.VK_BACK_SPACE, 0));
       this.mapShortCut.put(KEY_TOPIC_TEXT_NEXT_LINE,
           new KeyShortcut(KEY_TOPIC_TEXT_NEXT_LINE, KeyEvent.VK_ENTER, KeyEvent.SHIFT_MASK));
       this.mapShortCut
